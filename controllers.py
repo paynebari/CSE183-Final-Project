@@ -40,3 +40,9 @@ def index():
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
     )
+
+@action('my_callback')
+@action.uses() # Add here things like db, auth, etc.
+def my_callback():
+    # The return value should be a dictionary that will be sent as JSON.
+    return dict(my_value=3)
