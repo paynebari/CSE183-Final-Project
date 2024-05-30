@@ -13,6 +13,12 @@ def get_user_email():
 def get_time():
     return datetime.datetime.utcnow()
 
+def get_curr_time():
+    return datetime.time.utcnow()
+
+def get_date():
+    return datetime.date.utcnow()
+
 
 ### Define your table below
 #
@@ -21,10 +27,10 @@ def get_time():
 ## always commit your models to avoid problems later
 db.define_table('checklist',
                 Field('sampling_id'),
-                Field('latitude'),
-                Field('longitude'),
-                Field('date', 'date'), #re-check (create function like get_time?)
-                Field('time', 'time'), #re-check
+                Field('latitude','double'),
+                Field('longitude', 'double'),
+                Field('date', 'date', default=get_date), #re-check (create function like get_time?)
+                Field('time', 'time', default=get_curr_time), #re-check
                 Field('email', default=get_user_email),
                 Field('duration', 'integer')
                 )
