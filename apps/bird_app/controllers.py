@@ -45,4 +45,4 @@ def index():
 @action.uses() # Add here things like db, auth, etc.
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
-    return dict(my_value=3)
+    return dict(my_value=4)
