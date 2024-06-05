@@ -13,8 +13,8 @@ from py4web.utils.downloader import downloader
 from pydal.tools.tags import Tags
 from py4web.utils.factories import ActionFactory
 from py4web.utils.form import FormStyleBulma
-#from . import settings
-import settings
+from . import settings
+#import settings
 
 # #######################################################
 # implement custom loggers form settings.LOGGERS

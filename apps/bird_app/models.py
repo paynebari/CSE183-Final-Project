@@ -5,7 +5,7 @@ This file defines the database models
 import datetime
 import os
 import csv
-from common import db, Field, auth
+from .common import db, Field, auth
 from pydal.validators import *
 
 def get_user_email():
