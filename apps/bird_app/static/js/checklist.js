@@ -36,9 +36,12 @@ app.data = {
             let self = this; 
             let name = self.name;
             let count = self.count;
+            let sighting_id = "S80376372"
             axios.post(add_sightings_url, {
+                sighting_id: sighting_id,
                 name: name,
                 observation_count: count,
+                
             }).then(function (r) {
                 // This is time 2, much later, when the server answer comes back. 
                 console.log("Got the id");

@@ -49,6 +49,7 @@ def load_sightings():
     #sightings_list = db(db.sightings.user_email == get_user_email()).select().as_list()
     #(db.checklist.email == get_user_email) &
     sightings_list = db( 
+        (db.checklist.sampling_id == "S80376372") &
         (db.checklist.sampling_id == db.sightings.sighting_id)
     ).select(db.sightings.id, db.sightings.name, db.sightings.observation_count).as_list()
     #print("sightingslist",sightings_list)
@@ -59,7 +60,8 @@ def load_sightings():
 def add_sightings():
     name = request.json.get('name')
     observation_count = request.json.get('observation_count')
-    id = db.sightings.insert(name=name, observation_count=observation_count)
+    sighting_id = request.json.get('sighting_id')
+    id = db.sightings.insert(sighting_id=sighting_id, name=name, observation_count=observation_count)
     return dict(id=id)
 
 @action('inc_sightings', method='POST')
@@ -67,7 +69,7 @@ def add_sightings():
 def inc_sightings():
     id = request.json.get('id')
     bird = db(db.sightings.id == id).select().first()
-    assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
+    #assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
     bird.observation_count += 1
     bird.update_record()
     return dict(bird_count=bird.observation_count)
@@ -78,7 +80,7 @@ def del_sightings():
     # Complete.
     id = request.json.get('id')
     bird = db(db.sightings.id == id).select().first()
-    assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
+    #assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
     db(db.sightings.id == id).delete()
     return dict(success=True)
 # You can add other controllers here.
