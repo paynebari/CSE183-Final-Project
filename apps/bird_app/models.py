@@ -24,6 +24,7 @@ def get_date():
 # db.define_table('thing', Field('name'))
 #
 ## always commit your models to avoid problems later
+
 db.define_table('checklist',
                 Field('sampling_id'),
                 Field('latitude','double'),
@@ -40,14 +41,16 @@ db.define_table('species',
 
 
 db.define_table('sightings',
-                Field('sampling_id', 'reference checklist'),
-                Field('species_id', 'reference species'),
+                Field('sighting_id'),
+                #Field('species_id', 'reference species'),
                 Field('name', 'string'),
-                Field('observation_count', 'integer', default=0),               
+                Field('observation_count', 'integer', default=0), 
+                #Field('user_email', default=get_user_email),                
                 )
 
 
 # Get the path to the species.csv file
+
 current_dir = os.path.dirname(__file__)
 sightings_file_path = os.path.join(current_dir, 'uploads', 'sightings.csv')
 species_file_path = os.path.join(current_dir, 'uploads', 'species.csv')
@@ -67,10 +70,10 @@ if db(db.sightings).isempty():
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
         for row in reader:
-            #print(row)
             observation_count = 0 if row[2] == 'X' else int(row[2])
+            print(row[0])
             #print(db.sightings._insert(name=row[1], observation_count=observation_count))
-            db.sightings.insert(name=row[1], observation_count=observation_count)
+            db.sightings.insert(sighting_id=row[0], name=row[1], observation_count=observation_count)
 
 if db(db.checklist).isempty():
     with open(checklist_file_path, 'r') as f:
@@ -87,11 +90,28 @@ if db(db.checklist).isempty():
                                     email = row[5] + ("@example.com"),
                                     duration = int(duration)
                                     ))
-#print(db.species)
+
+
 #print(db.species._insert(name='Alex'))
 
+#db.sightings.truncate()
+"""
+things = db(db.sightings).select()
+checklist = db(db.checklist).select()
+sightings_list = db(db.sightings.sighting_id == db.checklist.sampling_id)
+for row in sightings_list.select():
+    print(row.checklist.sampling_id, row.sightings.name)
+"""
 db.commit()
 
 #print to check if db was properly filled
-things = db(db.sightings).select()
-print(things)
+
+#things = db(db.sightings.name).select()
+"""
+print(checklist)
+sightings_data = db(db.sightings).select()
+print("Sightings Data:")
+for record in sightings_data:
+    print(record)
+
+"""

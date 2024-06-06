@@ -33,16 +33,53 @@ from .models import get_user_email
 
 url_signer = URLSigner(session)
 
-@action('index')
-@action.uses('index.html', db, auth, url_signer)
-def index():
+@action('checklist')
+@action.uses('checklist.html', db, auth.user)
+def checklist():
     return dict(
-        # COMPLETE: return here any signed URLs you need.
-        my_callback_url = URL('my_callback', signer=url_signer),
+        load_sightings_url = URL('load_sightings'),
+        inc_sightings_url = URL('inc_sightings'),
+        add_sightings_url = URL('add_sightings'),
+        del_sightings_url = URL('del_sightings')
     )
 
-@action('my_callback')
-@action.uses() # Add here things like db, auth, etc.
-def my_callback():
-    # The return value should be a dictionary that will be sent as JSON.
-    return dict(my_value=4)
+@action('load_sightings')
+@action.uses(db, session, auth.user)
+def load_sightings():
+    #sightings_list = db(db.sightings.user_email == get_user_email()).select().as_list()
+    #(db.checklist.email == get_user_email) &
+    sightings_list = db( 
+        (db.checklist.sampling_id == db.sightings.sighting_id)
+    ).select(db.sightings.id, db.sightings.name, db.sightings.observation_count).as_list()
+    #print("sightingslist",sightings_list)
+    return dict(sightings=sightings_list)
+
+@action('add_sightings', method='POST')
+@action.uses(db, session, auth.user)
+def add_sightings():
+    name = request.json.get('name')
+    observation_count = request.json.get('observation_count')
+    id = db.sightings.insert(name=name, observation_count=observation_count)
+    return dict(id=id)
+
+@action('inc_sightings', method='POST')
+@action.uses(db, session, auth.user)
+def inc_sightings():
+    id = request.json.get('id')
+    bird = db(db.sightings.id == id).select().first()
+    assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
+    bird.observation_count += 1
+    bird.update_record()
+    return dict(bird_count=bird.observation_count)
+
+@action('del_sightings', method='POST')
+@action.uses(db, auth.user)
+def del_sightings():
+    # Complete.
+    id = request.json.get('id')
+    bird = db(db.sightings.id == id).select().first()
+    assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
+    db(db.sightings.id == id).delete()
+    return dict(success=True)
+# You can add other controllers here.
+
