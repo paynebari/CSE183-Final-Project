@@ -25,7 +25,7 @@ def get_date():
 #
 ## always commit your models to avoid problems later
 db.define_table('checklist',
-                Field('sampling_id'),
+                Field('sampling_id', 'string'),
                 Field('latitude','double'),
                 Field('longitude', 'double'),
                 Field('date', 'date', default=get_date), #re-check (create function like get_time?)
@@ -40,8 +40,8 @@ db.define_table('species',
 
 
 db.define_table('sightings',
-                Field('sampling_id', 'reference checklist'),
-                Field('species_id', 'reference species'),
+                Field('sample_id', 'string'),
+                #Field('species_id', 'reference species'),
                 Field('name', 'string'),
                 Field('observation_count', 'integer', default=0),               
                 )
@@ -59,25 +59,14 @@ if db(db.species).isempty():
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
         for row in reader:
-            #print(row)
             db.species.insert(type=row[0])
 
-if db(db.sightings).isempty():
-    with open(sightings_file_path, 'r') as f:
-        reader = csv.reader(f)
-        next(reader)  # Skip the first row (header)
-        for row in reader:
-            #print(row)
-            observation_count = 0 if row[2] == 'X' else int(row[2])
-            #print(db.sightings._insert(name=row[1], observation_count=observation_count))
-            db.sightings.insert(name=row[1], observation_count=observation_count)
 
 if db(db.checklist).isempty():
     with open(checklist_file_path, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
         for row in reader:
-            #print(row)
             duration = 0 if row[6] == '' else float(row[6])  # Convert to float first
             (db.checklist.insert(sampling_id = row[0],
                                     latitude = row[1],
@@ -87,11 +76,14 @@ if db(db.checklist).isempty():
                                     email = row[5] + ("@example.com"),
                                     duration = int(duration)
                                     ))
-#print(db.species)
-#print(db.species._insert(name='Alex'))
+
+if db(db.sightings).isempty():
+    with open(sightings_file_path, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the first row (header)
+        for row in reader:
+            observation_count = 0 if row[2] == 'X' else int(row[2])
+            db.sightings.insert(sample_id=row[0], name=row[1], observation_count=observation_count)
 
 db.commit()
 
-#print to check if db was properly filled
-things = db(db.sightings).select()
-print(things)
