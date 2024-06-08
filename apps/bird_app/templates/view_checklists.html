@@ -5,16 +5,13 @@
   <!-- Minimal content to verify the page loads -->
   <div class="container">
     <table class="table is-fullwidth is-striped">
-      <tr class="add-row">
-        <td>ID</td>
-        <td>View Checklist</td>
-        <td class="is-narrow"></td>
-      </tr>
       <tr class="item-row" v-for="c in checklists">
-        
-        <td> {{ c.sampling_id }} </td>
-        
+        <td>{{c.id}}</td>
+        <td>{{c.sampling_id}}</td>
+        <td>{{c.date}}</td>
+        <td><a :href="'checklist?sampling_id=' + c.sampling_id" class="button is-link">View Checklist</a></td>
         <td class="trash is-narrow"><i class="trash has-text-danger fa-solid fa-trash-can"></i></td>
+        <td class="is-narrow"></td>
       </tr>
     </table>
 </div>

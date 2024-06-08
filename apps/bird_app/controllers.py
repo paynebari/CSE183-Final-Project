@@ -54,8 +54,8 @@ def view_checklists():
 @action('load_checklists')
 @action.uses(db, auth.user)
 def load_checklists():
-    user_email = get_user_email()
-    checklists = db(db.checklist.user_email == user_email).select().as_list()
+    #user_email = get_user_email()
+    checklists = db(db.checklist.email == get_user_email).select().as_list()
     return dict(checklists=checklists)
 
 @action('load_sightings')
