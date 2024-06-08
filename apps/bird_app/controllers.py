@@ -43,6 +43,21 @@ def checklist():
         del_sightings_url = URL('del_sightings')
     )
 
+@action('view_checklists')
+@action.uses('view_checklists.html', db, auth.user)
+def view_checklists():
+    return dict(
+        load_checklists_url = URL('load_checklists'),
+    )
+
+
+@action('load_checklists')
+@action.uses(db, auth.user)
+def load_checklists():
+    user_email = get_user_email()
+    checklists = db(db.checklist.user_email == user_email).select().as_list()
+    return dict(checklists=checklists)
+
 @action('load_sightings')
 @action.uses(db, session, auth.user)
 def load_sightings():

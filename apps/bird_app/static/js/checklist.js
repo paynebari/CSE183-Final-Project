@@ -61,6 +61,9 @@ app.data = {
                 self.sightings.splice(i, 1);
             })
         },
+        submit_checklist: function() {
+            window.location.href = '/bird_app/view_checklists';
+        }
         
     }
 };
