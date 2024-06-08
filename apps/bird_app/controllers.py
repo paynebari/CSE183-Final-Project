@@ -49,7 +49,7 @@ def load_sightings():
     #sightings_list = db(db.sightings.user_email == get_user_email()).select().as_list()
     #(db.checklist.email == get_user_email) &
     sightings_list = db( 
-        (db.checklist.sampling_id == "S80376372") &
+        (db.checklist.sampling_id == "2001") &
         (db.checklist.sampling_id == db.sightings.sighting_id)
     ).select(db.sightings.id, db.sightings.name, db.sightings.observation_count).as_list()
     #print("sightingslist",sightings_list)
@@ -61,6 +61,7 @@ def add_sightings():
     name = request.json.get('name')
     observation_count = request.json.get('observation_count')
     sighting_id = request.json.get('sighting_id')
+    #sighting_id = db.checklist.sampling_id
     id = db.sightings.insert(sighting_id=sighting_id, name=name, observation_count=observation_count)
     return dict(id=id)
 

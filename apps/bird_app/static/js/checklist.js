@@ -36,7 +36,7 @@ app.data = {
             let self = this; 
             let name = self.name;
             let count = self.count;
-            let sighting_id = "S80376372"
+            let sighting_id = "2001"
             axios.post(add_sightings_url, {
                 sighting_id: sighting_id,
                 name: name,

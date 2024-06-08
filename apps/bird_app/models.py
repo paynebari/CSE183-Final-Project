@@ -11,14 +11,14 @@ from pydal.validators import *
 def get_user_email():
     return auth.current_user.get('email') if auth.current_user else None
 
-def get_time():
-    return datetime.datetime.utcnow()
+#def get_time():
+ #   return datetime.datetime.utcnow()
 
 def get_curr_time():
-    return datetime.time.utcnow()
+    return datetime.datetime.utcnow().time()
 
 def get_date():
-    return datetime.date.utcnow()
+    return datetime.datetime.utcnow().date()
 
 ### Define your table below
 # db.define_table('thing', Field('name'))
@@ -47,8 +47,35 @@ db.define_table('sightings',
                 Field('observation_count', 'integer', default=0), 
                 #Field('user_email', default=get_user_email),                
                 )
+db.checklist.truncate()
+(db.checklist.insert(sampling_id = "2002",
+                                    latitude = 37.06096445677006,
+                                    longitude = 37.06096445677006,
+                                    date = "2021-02-03",
+                                    time = "10:55:00",
+                                    email = "resh20.rm@gmail.com",
+                                    duration = 20
+                                    ))
+(db.checklist.insert(sampling_id = "2001",
+                                    latitude = 37.06096445677006,
+                                    longitude = 37.06096445677006,
+                                    date = "2021-02-03",
+                                    time = "10:55:00",
+                                    email = "resh20.rm@gmail.com",
+                                    duration = 20
+                                    ))
+(db.checklist.insert(sampling_id = "2003",
+                                    latitude = 37.06096445677006,
+                                    longitude = 37.06096445677006,
+                                    email = "resh20.rm@gmail.com",
+                                    duration = 20
+                                    ))
+db.sightings.truncate()
 
-
+db.sightings.insert(sighting_id="2002", name="2002 Robin", observation_count=2)
+db.sightings.insert(sighting_id="2002", name="2002 Pigeon", observation_count=2)
+db.sightings.insert(sighting_id="2001", name="2001 Crow", observation_count=2)
+db.sightings.insert(sighting_id="2001", name="2001 Swan", observation_count=2)
 # Get the path to the species.csv file
 
 current_dir = os.path.dirname(__file__)
@@ -94,7 +121,6 @@ if db(db.checklist).isempty():
 
 #print(db.species._insert(name='Alex'))
 
-#db.sightings.truncate()
 """
 things = db(db.sightings).select()
 checklist = db(db.checklist).select()
@@ -107,6 +133,10 @@ db.commit()
 #print to check if db was properly filled
 
 #things = db(db.sightings.name).select()
+s_id = "2002"
+checklist = db((db.checklist.email == "resh20.rm@gmail.com")).select()
+for c in checklist:
+    print(c, "sampling")
 """
 print(checklist)
 sightings_data = db(db.sightings).select()
