@@ -135,8 +135,8 @@ db.commit()
 #things = db(db.sightings.name).select()
 s_id = "2002"
 checklist = db((db.checklist.email == "resh20.rm@gmail.com")).select()
-for c in checklist:
-    print(c, "sampling")
+#for c in checklist:
+ #   print(c, "sampling")
 """
 print(checklist)
 sightings_data = db(db.sightings).select()

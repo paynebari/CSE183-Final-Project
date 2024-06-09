@@ -36,7 +36,10 @@ url_signer = URLSigner(session)
 @action('checklist')
 @action.uses('checklist.html', db, auth.user)
 def checklist():
+    sampling_id = request.params.get('sampling_id')
+    print(f"Received sampling_id: {sampling_id}")
     return dict(
+        sampling_id=sampling_id,
         load_sightings_url = URL('load_sightings'),
         inc_sightings_url = URL('inc_sightings'),
         add_sightings_url = URL('add_sightings'),
@@ -50,7 +53,6 @@ def view_checklists():
         load_checklists_url = URL('load_checklists'),
     )
 
-
 @action('load_checklists')
 @action.uses(db, auth.user)
 def load_checklists():
@@ -63,8 +65,9 @@ def load_checklists():
 def load_sightings():
     #sightings_list = db(db.sightings.user_email == get_user_email()).select().as_list()
     #(db.checklist.email == get_user_email) &
+    sampling_id = request.params.get('sampling_id')
     sightings_list = db( 
-        (db.checklist.sampling_id == "2001") &
+        (db.checklist.sampling_id == sampling_id) &
         (db.checklist.sampling_id == db.sightings.sighting_id)
     ).select(db.sightings.id, db.sightings.name, db.sightings.observation_count).as_list()
     #print("sightingslist",sightings_list)

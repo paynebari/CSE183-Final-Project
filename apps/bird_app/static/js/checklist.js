@@ -71,7 +71,9 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
-    axios.get(load_sightings_url).then(function (r) {
+    axios.get(load_sightings_url,{
+        params: { sampling_id: sampling_id } // Pass the sampling_id as a parameter
+    }).then(function (r) {
         console.log(r.status);
         let s = r.data.sightings;
         app.vue.sightings = s;
