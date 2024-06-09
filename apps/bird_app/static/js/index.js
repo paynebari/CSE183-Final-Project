@@ -18,6 +18,22 @@ app.data = {
             // This is an example.
             this.my_value += 1;
         },
+        initMap: function() {
+            let map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                zoom: 8
+            });
+
+            let marker = new google.maps.Marker({
+                position: {lat: -34.397, lng: 150.644},
+                map: map,
+                title: 'Bird Sighting!'
+            });
+        },
+
+    },
+    mounted() {
+        this.initMap();
     }
 };
 
