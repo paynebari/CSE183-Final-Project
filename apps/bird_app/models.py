@@ -29,8 +29,8 @@ db.define_table('checklist',
                 Field('sampling_id'),
                 Field('latitude','double'),
                 Field('longitude', 'double'),
-                Field('date', 'date', default=get_date), #re-check (create function like get_time?)
-                Field('time', 'time', default=get_curr_time), #re-check
+                Field('date', 'date', default=get_date), 
+                Field('time', 'time', default=get_curr_time), 
                 Field('email', default=get_user_email),
                 Field('duration', 'integer')
                 )
