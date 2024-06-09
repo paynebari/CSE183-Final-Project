@@ -10,7 +10,7 @@
         <td>{{c.sampling_id}}</td>
         <td>{{c.date}}</td>
         <td><a :href="'/bird_app/checklist?sampling_id=' + c.sampling_id" class="button is-link">View Checklist</a></td>
-        <td class="trash is-narrow"><i class="trash has-text-danger fa-solid fa-trash-can"></i></td>
+        <td class="trash is-narrow"><i class="trash has-text-danger fa-solid fa-trash-can" @click="delete_checklist(c.id)"></i></td>
         <td class="is-narrow"></td>
       </tr>
     </table>
@@ -21,6 +21,7 @@
 <!-- Loads the index-specific js for Vue -->
 <script>
   let load_checklists_url = "[[=XML(load_checklists_url)]]";
+  let del_checklists_url = "[[=XML(del_checklists_url)]]";
   
   // Add other URLs here if you wish.
 </script>

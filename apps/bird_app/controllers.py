@@ -51,6 +51,7 @@ def checklist():
 def view_checklists():
     return dict(
         load_checklists_url = URL('load_checklists'),
+        del_checklists_url = URL('del_checklists'),
     )
 
 @action('load_checklists')
@@ -101,6 +102,16 @@ def del_sightings():
     bird = db(db.sightings.id == id).select().first()
     #assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
     db(db.sightings.id == id).delete()
+    return dict(success=True)
+
+@action('del_checklists', method='POST')
+@action.uses(db, auth.user)
+def del_checklists():
+    # Complete.
+    id = request.json.get('id')
+    check = db(db.checklist.id == id).select().first()
+    #assert bird.user_email == get_user_email() # Only the owner of the observation can inc it. 
+    db(db.checklist.id == id).delete()
     return dict(success=True)
 # You can add other controllers here.
 

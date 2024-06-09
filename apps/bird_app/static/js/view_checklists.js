@@ -11,7 +11,24 @@ app.data = {
             checklists: [],
         };
     },
-    methods: {}
+    methods: {
+        find_checklist_idx: function(id) {
+            // Finds the index of an item in the list.
+            for (let i = 0; i < this.checklists.length; i++) {
+                if (this.checklists[i].id === id) {
+                    return i;
+                }
+            }
+            return null;
+        },
+        delete_checklist: function(id){
+            let self = this;
+            let i = self.find_checklist_idx(id);
+            axios.post(del_checklists_url, { id: id }).then(function (r) {
+                self.checklists.splice(i, 1);
+            })
+        },
+    }
 };
 
 app.vue = Vue.createApp(app.data).mount("#app");
