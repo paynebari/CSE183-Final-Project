@@ -5,10 +5,10 @@
   <div class="level-right">
     <div class="field has-addons">
       <p class="control">
-        <input class="input" type="text" placeholder="Find a post" />
+        <input class="input" type="text" v-model="search_query" placeholder="Find a post" />
       </p>
       <p class="control">
-        <button class="button">Search</button>
+        <button class="button" @click="filteredSightings">Search</button>
       </p>
     </div>
   </div>
@@ -22,7 +22,7 @@
         <td><input class="input" type="number" v-model="count" placeholder="Count" style="width: 87px;"></td>
         <td class="is-narrow"></td>
       </tr>
-      <tr class="item-row" v-for="s in sightings">
+      <tr class="item-row" v-for="s in filteredSightings">
         <td><i @click="add_count(s.id)" class="fa fa-plus-square"></i></td>
         <td> {{ s.observation_count }} </td>
         <td> {{ s.name}} </td>

@@ -10,9 +10,22 @@ app.data = {
         return {
             sightings: [],
             name: "",
-            count:""
+            count:"",
+            search_query:""
         };
     },
+
+    computed: {
+        filteredSightings: function() {
+            let self = this;
+            if (self.search_query) {
+                return self.sightings.filter(s => s.name.toLowerCase().includes(self.search_query.toLowerCase()));
+            } else {
+                return self.sightings;
+            }
+        }
+    },
+
     methods: {
         // Complete as you see fit.
         find_sighting_idx: function(id) {
