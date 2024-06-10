@@ -55,6 +55,7 @@ checklist_file_path = os.path.join(current_dir, 'uploads', 'checklists.csv')
 
 
 if db(db.species).isempty():
+    print("empty species")
     with open(species_file_path, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
@@ -63,6 +64,7 @@ if db(db.species).isempty():
 
 
 if db(db.checklist).isempty():
+    print("empty checklist")
     with open(checklist_file_path, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
@@ -78,12 +80,13 @@ if db(db.checklist).isempty():
                                     ))
 
 if db(db.sightings).isempty():
+    print("empty sightings")
     with open(sightings_file_path, 'r') as f:
         reader = csv.reader(f)
         next(reader)  # Skip the first row (header)
         for row in reader:
             observation_count = 0 if row[2] == 'X' else int(row[2])
             db.sightings.insert(sample_id=row[0], name=row[1], observation_count=observation_count)
-
+print("WOW!!!!!!!")
 db.commit()
 
