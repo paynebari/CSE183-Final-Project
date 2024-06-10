@@ -2,8 +2,6 @@ import os
 import zipfile
 import shutil
 
-SKIPPED = ['/databases/']
-
 def zip_all_in_folder(folder_path, base_path, output_zip):
     # Create a ZIP file
     with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -12,8 +10,6 @@ def zip_all_in_folder(folder_path, base_path, output_zip):
             for file in files:
                 # Create the full path to the file
                 file_path = os.path.join(root, file)
-                if any([s in file_path for s in SKIPPED]):
-                    continue
                 # Write the file to the zip, adjust the arcname to customize how the paths are stored
                 zipf.write(file_path, arcname=os.path.relpath(file_path, start=base_path))
 
