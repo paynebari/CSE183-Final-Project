@@ -76,7 +76,7 @@ if db(db.checklist).isempty():
                                     email = row[5] + ("@example.com"),
                                     duration = int(duration)
                                     ))
-db.sightings.truncate()
+#db.sightings.truncate()
 
 if db(db.sightings).isempty():
     with open(sightings_file_path, 'r') as f:
