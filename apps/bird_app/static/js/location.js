@@ -125,7 +125,7 @@ app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
     console.log("test");
-    axios.get(load_checklists_url).then(function(r){
+    axios.get(load_info_url).then(function(r){
         console.log(r.status);
         let c = r.data.checklists;
         let s = r.data.species;

@@ -55,23 +55,10 @@ def location():
         # COMPLETE: return here any signed URLs you need.
         load_sightings_url = URL('load_sightings'),
         load_species_url = URL('load_species'),
-        load_checklists_url = URL('load_checklists'),
+        load_info_url = URL('load_info'),
         my_callback_url = URL('my_callback', signer=url_signer),
         load_names_url = URL('load_names'),
     )
-
-@action('load_species')
-@action.uses(db, session, auth) # Add here things like db, auth, etc.
-def load_species():
-    # The return value should be a dictionary that will be sent as JSON.
-    species_list = db(db.species).select().as_list()
-    return dict(species=species_list)
-
-@action('load_sightings')
-@action.uses(db, session, auth.user)
-def load_sightings():
-    sightings_list = db(db.sightings.user_email == get_user_email()).select().as_list()
-    return dict(sightings=sightings_list)
 
 @action('load_names', method="POST")
 @action.uses(db, session, auth)
@@ -129,9 +116,9 @@ def load_names():
 
 
 
-@action('load_checklists')
+@action('load_info')
 @action.uses(db, session, auth) # Add here things like db, auth, etc.
-def load_checklists():
+def load_info():
     latitude = 37.5
     #longitude = request.json.get('longitude')
     longitude = -78
