@@ -93,7 +93,7 @@ def load_names():
     sampling_ids = [checklist['sampling_id'] for checklist in checklists]
     print("Sampling id:", sampling_ids)
     # Query for the sightings of the specific bird name within the sampling IDs
-    sightings = db((db.sightings.sightings_id.belongs(sampling_ids)) &
+    sightings = db((db.sightings.sighting_id.belongs(sampling_ids)) &
                    (db.sightings.name == bird_name)).select().as_list()
     print("Sightings:", sightings)
     # Aggregate the count of sightings over time
@@ -102,7 +102,7 @@ def load_names():
     
     counts_by_date = defaultdict(int)
     for sighting in sightings:
-        sampling_id = sighting['sightings_id']
+        sampling_id = sighting['sighting_id']
         observation_date = db(db.checklist.sampling_id == sampling_id).select(db.checklist.date).first()
         date_str = observation_date.date.strftime("%Y-%m-%d")
         counts_by_date[date_str] += sighting['observation_count']
@@ -147,7 +147,7 @@ def load_info():
     sampling_ids = [checklist['sampling_id'] for checklist in checklists]
 
     # Find sightings corresponding to the sampling IDs
-    sightings = db(db.sightings.sightings_id.belongs(sampling_ids)).select().as_list()
+    sightings = db(db.sightings.sighting_id.belongs(sampling_ids)).select().as_list()
 
     # Count sightings for each species
     species_count = {}
