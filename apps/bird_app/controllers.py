@@ -54,7 +54,8 @@ def user_stats():
     return dict(
         load_species_url = URL('load_species'),
         order_first_seen_url = URL('order_first_seen'),
-        order_recently_seen_url = URL('order_recently_seen')
+        order_recently_seen_url = URL('order_recently_seen'),
+        reset_url = URL('reset'),
     )
 
 @action('load_species')
@@ -71,7 +72,7 @@ def load_species():
     # Select the name, date and time. 
     rows = db(
         (db.checklist.email == get_user_email()) &
-        (db.checklist.sampling_id == db.sightings.sample_id)).select(
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
             db.sightings.name, db.checklist.date, db.checklist.time).as_list()
  
     # Final list will be the list returned. It will have dicts that have the name, date and time, and are
@@ -86,16 +87,18 @@ def load_species():
                 date=row['checklist']['date'],
                 time=row['checklist']['time']))
 
-    for row in final_list:
-        print(row) 
+    #for row in final_list:
+    #    print(row) 
 
-    plot_data = db((db.checklist.email == get_user_email()) &
-        (db.checklist.sampling_id == db.sightings.sample_id)).select(
+    data = db((db.checklist.email == get_user_email()) &
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
             db.checklist.date, db.sightings.observation_count).as_list()
-    for row in plot_data:
+
+    print("data in controllers.py")
+    for row in data:
         print(row)
 
-    return dict(species_list=final_list, query="", all_sightings_list=plot_data)
+    return dict(species_list=final_list, query="", plot_data=data)
 
 
 @action('order_first_seen', method='POST')
@@ -108,7 +111,7 @@ def order_first_seen():
     #).select(db.sightings.name, distinct=True, orderby=myorder)
 
     # Join tables and select those that have the same email as the current user, also order by date and time.
-    rows = db((db.checklist.sampling_id == db.sightings.sample_id) & 
+    rows = db((db.checklist.sampling_id == db.sightings.sighting_id) & 
               (db.checklist.email == get_user_email())).select(
                   db.sightings.name, db.checklist.date, db.checklist.time, orderby=myorder).as_list()
     
@@ -130,12 +133,12 @@ def order_first_seen():
                 date=row['checklist']['date'],
                 time=row['checklist']['time']))
 
-    print("length 1 " + str(len(rows)))
-    print(final_list)
-    print(len(final_list))
+    #print("length 1 " + str(len(rows)))
+    #print(final_list)
+    #print(len(final_list))
 
     # Tests to see if it works for the reverse order.
-    #rows2 = db((db.checklist.sampling_id == db.sightings.sample_id)
+    #rows2 = db((db.checklist.sampling_id == db.sightings.:)
     #          & (db.checklist.email == get_user_email())).select(db.sightings.name, orderby=~myorder).as_list()
 
     #final_list2 = []
@@ -157,7 +160,7 @@ def order_first_seen():
 def order_first_seen():
     myorder = ~db.checklist.date | ~db.checklist.time
 
-    rows = db((db.checklist.sampling_id == db.sightings.sample_id) & 
+    rows = db((db.checklist.sampling_id == db.sightings.sighting_id) & 
               (db.checklist.email == get_user_email())).select(
                   db.sightings.name, db.checklist.date, db.checklist.time, orderby=myorder).as_list()
     
@@ -171,8 +174,28 @@ def order_first_seen():
                 date=row['checklist']['date'],
                 time=row['checklist']['time']))
 
-    print(final_list)
-    print(len(final_list))
+    #print(final_list)
+    #print(len(final_list))
 
     return dict(species_list=final_list)
     
+
+@action('reset', method='POST')
+@action.uses(db, auth.user)
+def reset():
+    rows = db(
+        (db.checklist.email == get_user_email()) &
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
+            db.sightings.name, db.checklist.date, db.checklist.time).as_list()
+    
+    final_list = []
+    temp_list = []
+    for row in rows:
+        if row['sightings']['name'] not in temp_list:
+            temp_list.append(row['sightings']['name'])
+            final_list.append(dict(
+                name=row['sightings']['name'],
+                date=row['checklist']['date'],
+                time=row['checklist']['time']))
+   
+    return dict(species_list=final_list)

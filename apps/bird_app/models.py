@@ -40,7 +40,7 @@ db.define_table('species',
 
 
 db.define_table('sightings',
-                Field('sample_id', 'string'),
+                Field('sighting_id', 'string'),
                 #Field('species_id', 'reference species'),
                 Field('name', 'string'),
                 Field('observation_count', 'integer', default=0),               
@@ -83,7 +83,7 @@ if db(db.sightings).isempty():
         next(reader)  # Skip the first row (header)
         for row in reader:
             observation_count = 0 if row[2] == 'X' else int(row[2])
-            db.sightings.insert(sample_id=row[0], name=row[1], observation_count=observation_count)
+            db.sightings.insert(sighting_id=row[0], name=row[1], observation_count=observation_count)
 
 db.commit()
 

@@ -21,27 +21,26 @@
     </th>
     <td> 
       <button 
-      class="button media-right is-primary" @click="order_first_seen">
+      class="button media-right is-success" @click="order_first_seen">
       First-Seen</button>
     </td>
     <td> 
       <button 
-      class="button media-right is-danger" @click="order_recently_seen">
+      class="button media-right is-primary" @click="order_recently_seen">
       Recently-Seen</button>
     </td>
-    <td>
-      <!--
-      <div class="section" id="vue-target" v-cloak>
-        <div class="control block">
-          <input class="input" type="text" v-model="query" @keyup="search" />
-        </div>
-      </div>
-    -->
+    <td> 
+      <button 
+      class="button media-right is-danger" @click="reset">
+      Reset</button>
+    </td>
     <td> 
       <div>
-        <input class="input" type="text" v-model="search_query" name="search_query" placeholder="Type Search..."/>
+        <input class="input" type="text" v-model="search_query" placeholder="Type Search..."/>
       </div>
+      <button class="button media-left" @click="search">Search</button>
     </td>
+    <td>
   </thead>
 
 
@@ -75,14 +74,23 @@
       </tr>
     </tbody>
   </table>
+
+
+  <!--Chart -->
+  <div>
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </div>  
 </div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 [[block page_scripts]]
-<!-- Loads the index-specific js for Vue -->
 <script>
   let load_species_url = "[[=XML(load_species_url)]]"; 
   let order_first_seen_url = "[[=XML(order_first_seen_url)]]";  
   let order_recently_seen_url = "[[=XML(order_recently_seen_url)]]";  
+  let reset_url = "[[=XML(reset_url)]]";  
 </script>
 <script src="js/user_stats.js"></script>
 
