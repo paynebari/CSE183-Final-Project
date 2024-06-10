@@ -15,6 +15,7 @@ app.data = {
             birdSightings: [],
             speciesList: [],
             selectedBounds: null,
+            selectedLatLng: null,
             get_sightings_url: get_sightings_url, // Use the URL passed from the template
             get_species_url: get_species_url     // Use the URL passed from the template
         };
@@ -26,6 +27,11 @@ app.data = {
                 zoom: 8
             });
             
+            google.maps.event.addListener(this.map, 'click', (event) => {
+                this.selectedLatLng = event.latLng;
+                console.log("Selected LatLng:", this.selectedLatLng);
+            });
+
             this.drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: null,
                 drawingControl: true,
@@ -110,6 +116,12 @@ app.data = {
                 alert("draw a rectangle to select a region first");
             }
         },
+        openChecklistPage(latLng) {
+            const lat = latLng.lat();
+            const lng = latLng.lng();
+            const url = `checklist?lat=${lat}&lng=${lng}`;
+            window.location.href = url;
+        }
     },
     mounted() {
         this.initMap();

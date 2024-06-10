@@ -40,7 +40,7 @@ db.define_table('species',
 
 
 db.define_table('sightings',
-                Field('sample_id', 'string'),
+                Field('sighting_id', 'string'),
                 #Field('species_id', 'reference species'),
                 Field('name', 'string'),
                 Field('observation_count', 'integer', default=0),               

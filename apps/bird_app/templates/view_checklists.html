@@ -1,0 +1,30 @@
+[[extend 'layout.html']]
+
+<div class="section" id="app">
+  <h1 class="title" style="text-align: center;">View Checklists</h1>
+  <!-- Minimal content to verify the page loads -->
+  <div class="container">
+    <table class="table is-fullwidth is-striped">
+      <tr class="item-row" v-for="c in checklists">
+        <td>{{c.id}}</td>
+        <td>{{c.sampling_id}}</td>
+        <td>{{c.date}}</td>
+        <td>{{c.time}}</td>
+        <td><a :href="'/bird_app/checklist?sampling_id=' + c.sampling_id" class="button is-link">View Checklist</a></td>
+        <td class="trash is-narrow"><i class="trash has-text-danger fa-solid fa-trash-can" @click="delete_checklist(c.id)"></i></td>
+        <td class="is-narrow"></td>
+      </tr>
+    </table>
+</div>
+
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+  let load_checklists_url = "[[=XML(load_checklists_url)]]";
+  let del_checklists_url = "[[=XML(del_checklists_url)]]";
+  
+  // Add other URLs here if you wish.
+</script>
+<script src="js/view_checklists.js"></script>
+[[end]]
