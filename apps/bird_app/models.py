@@ -52,7 +52,7 @@ db.checklist.truncate()
                                     latitude = 37.06096445677006,
                                     longitude = 37.06096445677006,
                                     date = "2021-02-03",
-                                    time = "10:55:00",
+                                    time = "23:35:20",
                                     email = "resh20.rm@gmail.com",
                                     duration = 20
                                     ))
@@ -60,7 +60,7 @@ db.checklist.truncate()
                                     latitude = 37.06096445677006,
                                     longitude = 37.06096445677006,
                                     date = "2021-02-03",
-                                    time = "10:55:00",
+                                    time = "13:55:00",
                                     email = "resh20.rm@gmail.com",
                                     duration = 20
                                     ))
