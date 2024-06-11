@@ -108,7 +108,9 @@ app.data = {
             if (this.selectedBounds) {
                 const ne = this.selectedBounds.getNorthEast();
                 const sw = this.selectedBounds.getSouthWest();
-                const url = `location?ne_lat=${ne.lat()}&ne_lng=${ne.lng()}&sw_lat=${sw.lat()}&sw_lng=${sw.lng()}`;
+                const url = `/bird_app/location?ne_lat=${ne.lat()}&ne_lng=${ne.lng()}&sw_lat=${sw.lat()}&sw_lng=${sw.lng()}`;
+                //const url = `/bird_app/location`;
+                console.log(url)
                 window.location.href = url;
             } else {
                 alert("Please draw a rectangle to select a region first.");

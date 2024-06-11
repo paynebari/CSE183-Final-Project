@@ -1,0 +1,99 @@
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
+
+
+<div class="section" id="app" v-cloak>
+  <!-- Put here your Vue.js template -->
+  <div class="block has-background-primary-15 has-text-primary-15-invert">
+    <h1 class="title">
+      <i class="title is-1"></i> <strong>User Statistics</strong>     
+    </h1>
+  </div>
+  <thead>
+    <th>
+      <strong>Species Seen</strong>
+      <span class="icon">
+        <i class="fas fa-dove"></i>
+      </span>
+    </th>
+    <td> 
+      <button 
+      class="button media-right is-success" @click="order_first_seen">
+      First-Seen</button>
+    </td>
+    <td> 
+      <button 
+      class="button media-right is-primary" @click="order_recently_seen">
+      Recently-Seen</button>
+    </td>
+    <td> 
+      <button 
+      class="button media-right is-danger" @click="reset">
+      Reset</button>
+    </td>
+    <td> 
+      <div>
+        <input class="input" type="text" v-model="search_query" placeholder="Type Search..."/>
+      </div>
+      <button class="button media-left" @click="search">Search</button>
+    </td>
+    <td>
+  </thead>
+
+
+  <table class ="table is-striped is is-fullwidth is-hoverable">
+    <tbody>
+      <tr class = "species-row" v-for="s in species_list">
+        <td class="species list"> {{ s.name }} </td>
+        <td>
+          <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4">
+              <span class="icon">
+                <i class="fas fa-calendar-week"></i> 
+              </span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>
+                  Was seen on <strong>{{s.date}} at {{s.time}}</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!--Chart -->
+  <div>
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </div>  
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+[[block page_scripts]]
+<script>
+  let load_species_url = "[[=XML(load_species_url)]]"; 
+  let order_first_seen_url = "[[=XML(order_first_seen_url)]]";  
+  let order_recently_seen_url = "[[=XML(order_recently_seen_url)]]";  
+  let reset_url = "[[=XML(reset_url)]]";  
+</script>
+<script src="js/user_stats.js"></script>
+
+[[end]]

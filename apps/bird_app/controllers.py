@@ -183,3 +183,250 @@ def create_checklist():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=4)
+
+# location stuff
+
+@action('location')
+@action.uses('location.html', db, auth, url_signer)
+def location():
+    ne_lat = request.params.get('ne_lat')  # get values from url
+    ne_lng = request.params.get('ne_lng')  # 
+    sw_lat = request.params.get('sw_lat')  # 
+    sw_lng = request.params.get('sw_lng')  # 
+    
+    return dict(
+        # COMPLETE: return here any signed URLs you need.
+        load_sightings_url = URL('load_sightings'),
+        load_species_url = URL('load_species'),
+        load_info_url = URL('load_info'),
+        my_callback_url = URL('my_callback', signer=url_signer),
+        load_names_url = URL('load_names'),
+        ne_lat = ne_lat,
+        ne_lng = ne_lng,
+        sw_lat = sw_lat,
+        sw_lng = sw_lng,
+    )
+
+@action('load_names', method="POST")
+@action.uses(db, session, auth)
+def load_names():
+    # The return value should be a dictionary that will be sent as JSON.
+    bird_name = request.json.get("bird_name")
+    #latitude = request.json.get('latitude')
+    ne_lat = request.json.get('ne_lat')
+    ne_lng = request.json.get('ne_lng')
+    sw_lat = request.json.get('sw_lat')
+    sw_lng = request.json.get('sw_lng')
+
+    # Calculate the bounding box for the region
+    lat_min = float(sw_lat)
+    lat_max = float(ne_lat)
+    long_min = float(sw_lng)
+    long_max = float(ne_lng)
+
+    # Query for the checklists within the specified region
+    checklists = db((db.checklist.latitude >= lat_min) &
+                    (db.checklist.latitude <= lat_max) &
+                    (db.checklist.longitude >= long_min) &
+                    (db.checklist.longitude <= long_max)).select().as_list()
+
+    sampling_ids = [checklist['sampling_id'] for checklist in checklists]
+
+    # Query for the sightings of the specific bird name within the sampling IDs
+    sightings = db((db.sightings.sighting_id.belongs(sampling_ids)) &
+                   (db.sightings.name == bird_name)).select().as_list()
+    # Aggregate the count of sightings over time
+    from collections import defaultdict
+    from datetime import datetime
+    
+    counts_by_date = defaultdict(int)
+    for sighting in sightings:
+        sampling_id = sighting['sighting_id']
+        observation_date = db(db.checklist.sampling_id == sampling_id).select(db.checklist.date).first()
+        date_str = observation_date.date.strftime("%Y-%m-%d")
+        counts_by_date[date_str] += sighting['observation_count']
+
+    # Sort dates and prepare data for the chart
+    sorted_dates = sorted(counts_by_date.keys())
+    counts = [counts_by_date[date] for date in sorted_dates]
+    
+    return dict(labels=sorted_dates, values=counts)
+
+
+
+@action('load_info')
+@action.uses(db, session, auth) # Add here things like db, auth, etc.
+def load_info():
+    ne_lat = request.params.get('ne_lat')
+    ne_lng = request.params.get('ne_lng')
+    sw_lat = request.params.get('sw_lat')
+    sw_lng = request.params.get('sw_lng')
+
+    # Calculate the bounding box for the region
+    lat_min = float(sw_lat)
+    lat_max = float(ne_lat)
+    long_min = float(sw_lng)
+    long_max = float(ne_lng)
+
+    # Query for the checklists within the specified region
+    checklists = db((db.checklist.latitude >= lat_min) &
+                    (db.checklist.latitude <= lat_max) &
+                    (db.checklist.longitude >= long_min) &
+                    (db.checklist.longitude <= long_max)).select().as_list()
+    
+    # Extract sampling IDs from checklists
+    sampling_ids = [checklist['sampling_id'] for checklist in checklists]
+
+    # Find sightings corresponding to the sampling IDs
+    sightings = db(db.sightings.sighting_id.belongs(sampling_ids)).select().as_list()
+
+    # Count sightings for each species
+    species_count = {}
+    for sighting in sightings:
+        species = sighting['name']
+        if species in species_count:
+            species_count[species] += 1
+        else:
+            species_count[species] = 1
+
+    # Filter species with more than 1 sighting
+    species_with_multiple_sightings = [species for species, count in species_count.items() if count > 1]
+
+    # Get species details from the species table
+    unique_species = db(db.species.type.belongs(species_with_multiple_sightings)).select().as_list()
+
+    # Calculate the total number of sightings in the region
+    total_sightings = sum(sighting['observation_count'] for sighting in sightings)
+
+    # Calculate the top three users with the most sightings
+    user_sighting_counts = {}
+    for checklist in checklists:
+        user_email = checklist['email']
+        if user_email in user_sighting_counts:
+            user_sighting_counts[user_email] += 1
+        else:
+            user_sighting_counts[user_email] = 1
+
+    # Sort users by their sighting counts and get the top three
+    top_users = sorted(user_sighting_counts.items(), key=lambda item: item[1], reverse=True)[:3]
+    
+
+    return dict(
+        checklists=checklists,
+        species=unique_species,
+        total_sightings=total_sightings,
+        top_users=top_users
+    )
+
+# end of location stuff
+
+# start of user stat stuff
+
+@action('user_stats')
+@action.uses('user_stats.html', db, auth.user)
+def user_stats():
+    return dict(
+        load_species_url = URL('load_species'),
+        order_first_seen_url = URL('order_first_seen'),
+        order_recently_seen_url = URL('order_recently_seen'),
+        reset_url = URL('reset'),
+    )
+
+@action('load_species')
+@action.uses(db,auth.user)
+def load_species():
+    # Select rows that have the current user email in checklist and also have the same sampling_id/sample_id
+    # Select the name, date and time. 
+    rows = db(
+        (db.checklist.email == get_user_email()) &
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
+            db.sightings.name, db.checklist.date, db.checklist.time).as_list()
+ 
+    # Final list will be the list returned. It will have dicts that have the name, date and time, and are
+    # distinct. With the way they are added to the list, the order should be preserved. 
+    final_list = []
+    temp_list = []
+    for row in rows:
+        if row['sightings']['name'] not in temp_list:
+            temp_list.append(row['sightings']['name'])
+            final_list.append(dict(
+                name=row['sightings']['name'],
+                date=row['checklist']['date'],
+                time=row['checklist']['time']))
+
+    data = db((db.checklist.email == get_user_email()) &
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
+            db.checklist.date, db.sightings.observation_count).as_list()
+
+    print("data in controllers.py")
+    for row in data:
+        print(row)
+
+    return dict(species_list=final_list, query="", plot_data=data)
+
+@action('order_first_seen', method='POST')
+@action.uses(db, auth.user)
+def order_first_seen():
+    myorder = db.checklist.date | db.checklist.time
+    
+    # Join tables and select those that have the same email as the current user, also order by date and time.
+    rows = db((db.checklist.sampling_id == db.sightings.sighting_id) & 
+              (db.checklist.email == get_user_email())).select(
+                  db.sightings.name, db.checklist.date, db.checklist.time, orderby=myorder).as_list()
+    
+    # Now that the bird names are ordered by date and time, we just need to add to the final list all the distinct
+    # names, aka all names that are not yet in the list. 
+    final_list = []
+    temp_list = []
+    for row in rows:
+        if row['sightings']['name'] not in temp_list:
+            temp_list.append(row['sightings']['name'])
+            final_list.append(dict(
+                name=row['sightings']['name'],
+                date=row['checklist']['date'],
+                time=row['checklist']['time']))
+
+    return dict(species_list=final_list)
+
+@action('order_recently_seen', method='POST')
+@action.uses(db, auth.user)
+def order_first_seen():
+    myorder = ~db.checklist.date | ~db.checklist.time
+
+    rows = db((db.checklist.sampling_id == db.sightings.sighting_id) & 
+              (db.checklist.email == get_user_email())).select(
+                  db.sightings.name, db.checklist.date, db.checklist.time, orderby=myorder).as_list()
+    
+    final_list = []
+    temp_list = []
+    for row in rows:
+        if row['sightings']['name'] not in temp_list:
+            temp_list.append(row['sightings']['name'])
+            final_list.append(dict(
+                name=row['sightings']['name'],
+                date=row['checklist']['date'],
+                time=row['checklist']['time']))
+
+    return dict(species_list=final_list)
+
+@action('reset', method='POST')
+@action.uses(db, auth.user)
+def reset():
+    rows = db(
+        (db.checklist.email == get_user_email()) &
+        (db.checklist.sampling_id == db.sightings.sighting_id)).select(
+            db.sightings.name, db.checklist.date, db.checklist.time).as_list()
+    
+    final_list = []
+    temp_list = []
+    for row in rows:
+        if row['sightings']['name'] not in temp_list:
+            temp_list.append(row['sightings']['name'])
+            final_list.append(dict(
+                name=row['sightings']['name'],
+                date=row['checklist']['date'],
+                time=row['checklist']['time']))
+   
+    return dict(species_list=final_list)
+
+# end of user stat stuff
