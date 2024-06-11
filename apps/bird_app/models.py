@@ -15,10 +15,10 @@ def get_time():
     return datetime.datetime.utcnow()
 
 def get_curr_time():
-    return datetime.time.utcnow()
+    return datetime.time.utcnow().time()
 
 def get_date():
-    return datetime.date.utcnow()
+    return datetime.date.utcnow().date()
 
 ### Define your table below
 # db.define_table('thing', Field('name'))
@@ -86,7 +86,7 @@ if db(db.sightings).isempty():
         next(reader)  # Skip the first row (header)
         for row in reader:
             observation_count = 0 if row[2] == 'X' else int(row[2])
-            db.sightings.insert(sample_id=row[0], name=row[1], observation_count=observation_count)
+            db.sightings.insert(sighting_id=row[0], name=row[1], observation_count=observation_count)
 print("WOW!!!!!!!")
 db.commit()
 

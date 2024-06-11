@@ -22,8 +22,29 @@
     </div>
   </div>
   <div id="map" style="height: 500px;"></div>
+  <div class="field">
+    <label class="label">Date</label>
+    <div class="control">
+      <input class="input" type="date" v-model="checklistDate">
+      <small class="help">Format: YYYY-MM-DD</small>
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Time</label>
+    <div class="control">
+      <input class="input" type="time" v-model="checklistTime">
+      <small class="help">Format: HH:MM:SS</small>
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Duration (minutes)</label>
+    <div class="control">
+      <input class="input" type="number" v-model="checklistDuration">
+      <small class="help">Enter duration in minutes</small>
+    </div>
+  </div>
   <button class="button is-link" @click="showRegionStatistics">Statistics on Region</button>
-  <button v-if="selectedLatLng" class="button is-primary" @click="openChecklistPage(selectedLatLng)">Enter Checklist</button>
+  <butto class="button is-primary" @click="openChecklistPage()">Enter Checklist</button>
 </div>
 
 
@@ -32,7 +53,9 @@
 <script>
   let get_sightings_url = "[[=URL('get_sightings')]]";
   let get_species_url = "[[=URL('get_species')]]";
+  let create_checklist_url = "[[=URL('create_checklist')]]";
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2s6EEoCwq_uFKuR2vnM8ussLeaj_E_Ho&libraries=visualization,drawing"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
 <script src="js/index.js"></script>
 [[end]]

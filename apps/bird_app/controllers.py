@@ -24,7 +24,7 @@ The path follows the bottlepy syntax.
 session, db, T, auth, and tempates are examples of Fixtures.
 Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app will result in undefined behavior
 """
-
+import uuid
 from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
@@ -40,6 +40,7 @@ def index():
         # COMPLETE: return here any signed URLs you need.
         get_sightings_url = URL('get_sightings'),
         get_species_url = URL('get_species'),
+        create_checklist_url = URL('create_checklist')
     )
 #checklist stuff
 @action('checklist')
@@ -142,6 +143,40 @@ def get_sightings():
 def get_species():
     species_list = db(db.species).select().as_list()
     return dict(species=species_list)
+
+@action('create_checklist', method=["POST"])
+@action.uses(db, auth.user)
+def create_checklist():
+    print("Create checklist endpoint called")
+    data = request.json
+    sampling_id = data.get('sampling_id')
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    date = data.get('date')
+    time = data.get('time')
+    duration = data.get('duration')
+    user_email = get_user_email()
+
+    if not all([sampling_id, latitude, longitude, date, time, duration, user_email]):
+        abort(400, "Missing required fields")
+
+    print(f"Creating checklist with data: {data}")
+    print(f"User email: {user_email}")
+
+    db.checklist.insert(
+        sampling_id=sampling_id,
+        latitude=latitude,
+        longitude=longitude,
+        date=date,
+        time=time,
+        email=user_email,
+        duration=duration
+    )
+    
+    # Commit the transaction
+    db.commit()
+    
+    return dict(sampling_id=sampling_id)
 
 @action('my_callback')
 @action.uses() # Add here things like db, auth, etc.

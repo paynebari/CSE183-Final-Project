@@ -2,6 +2,7 @@
 
 // This will be the object that will contain the Vue attributes
 // and be used to initialize it.
+
 let app = {};
 
 
@@ -16,8 +17,12 @@ app.data = {
             speciesList: [],
             selectedBounds: null,
             selectedLatLng: null,
+            checklistDate: '',
+            checklistTime: '',
+            checklistDuration: '',
             get_sightings_url: get_sightings_url, // Use the URL passed from the template
-            get_species_url: get_species_url     // Use the URL passed from the template
+            get_species_url: get_species_url,     // Use the URL passed from the template
+            create_checklist_url: create_checklist_url
         };
     },
     methods: {
@@ -116,11 +121,34 @@ app.data = {
                 alert("draw a rectangle to select a region first");
             }
         },
-        openChecklistPage(latLng) {
-            const lat = latLng.lat();
-            const lng = latLng.lng();
-            const url = `checklist?lat=${lat}&lng=${lng}`;
-            window.location.href = url;
+        openChecklistPage() {
+            const date = this.checklistDate;
+            const time = this.checklistTime;
+            const duration = this.checklistDuration;
+            const uniqueId = uuid.v4();
+            const latLng = this.selectedLatLng
+
+            if (latLng && date && time && duration) {
+                const lat = latLng.lat();
+                const lng = latLng.lng();
+
+            axios.post(this.create_checklist_url, {
+                sampling_id: uniqueId,
+                latitude: lat,
+                longitude: lng,
+                date: date,
+                time: time,
+                duration: duration
+            }).then(response => {
+                const url = `/bird_app/checklist?sampling_id=${uniqueId}`;
+                window.location.href = url;
+            }).catch(error => {
+                console.error("Error creating checklist:", error);
+            });
+
+            } else {
+                alert("Please draw a rectangle, enter date, time, and duration.");
+            }
         }
     },
     mounted() {
