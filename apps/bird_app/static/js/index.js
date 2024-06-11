@@ -22,7 +22,7 @@ app.data = {
             checklistDuration: '',
             get_sightings_url: get_sightings_url, // Use the URL passed from the template
             get_species_url: get_species_url,     // Use the URL passed from the template
-            create_checklist_url: create_checklist_url
+            create_checklist_url: create_checklist_url // random comment
         };
     },
     methods: {
