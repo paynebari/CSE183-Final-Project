@@ -108,17 +108,10 @@ app.data = {
             if (this.selectedBounds) {
                 const ne = this.selectedBounds.getNorthEast();
                 const sw = this.selectedBounds.getSouthWest();
-                const bounds = {
-                    ne: { lat: ne.lat(), lng: ne.lng() },
-                    sw: { lat: sw.lat(), lng: sw.lng() }
-                };
-                const boundsStr = encodeURIComponent(JSON.stringify(bounds));
-                const checklistStr = encodeURIComponent(JSON.stringify(this.birdSightings));
-                const url = `checklist?bounds=${boundsStr}&checklist=${checklistStr}`;
+                const url = `location?ne_lat=${ne.lat()}&ne_lng=${ne.lng()}&sw_lat=${sw.lat()}&sw_lng=${sw.lng()}`;
                 window.location.href = url;
-                //console.log("Selected region bounds:", this.selectedBounds.toString());
             } else {
-                alert("draw a rectangle to select a region first");
+                alert("Please draw a rectangle to select a region first.");
             }
         },
         openChecklistPage() {
