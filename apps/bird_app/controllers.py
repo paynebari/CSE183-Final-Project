@@ -38,8 +38,8 @@ url_signer = URLSigner(session)
 def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
-        my_callback_url = URL('my_callback', signer=url_signer),
-        load_sightings_url = URL('load_sightings'),
+        get_sightings_url = URL('get_sightings'),
+        get_species_url = URL('get_species'),
     )
 
 @action('my_callback')
@@ -51,6 +51,11 @@ def my_callback():
 @action('location')
 @action.uses('location.html', db, auth, url_signer)
 def location():
+    ne_lat = request.params.get('ne_lat')  # get values from url
+    ne_lng = request.params.get('ne_lng')  # 
+    sw_lat = request.params.get('sw_lat')  # 
+    sw_lng = request.params.get('sw_lng')  # 
+    
     return dict(
         # COMPLETE: return here any signed URLs you need.
         load_sightings_url = URL('load_sightings'),
@@ -58,6 +63,10 @@ def location():
         load_info_url = URL('load_info'),
         my_callback_url = URL('my_callback', signer=url_signer),
         load_names_url = URL('load_names'),
+        ne_lat = ne_lat,
+        ne_lng = ne_lng,
+        sw_lat = sw_lat,
+        sw_lng = sw_lng,
     )
 
 @action('load_names', method="POST")
@@ -66,23 +75,16 @@ def load_names():
     # The return value should be a dictionary that will be sent as JSON.
     bird_name = request.json.get("bird_name")
     #latitude = request.json.get('latitude')
-    latitude = 37.5
-    #longitude = request.json.get('longitude')
-    longitude = -78
-    radius = 0.1  # default radius of 0.1 degree
-    print(bird_name)
-
-        # Calculate the bounding box for the region
-    lat_min = latitude - radius
-    lat_max = latitude + radius
-    long_min = longitude - radius
-    long_max = longitude + radius
+    ne_lat = request.json.get('ne_lat')
+    ne_lng = request.json.get('ne_lng')
+    sw_lat = request.json.get('sw_lat')
+    sw_lng = request.json.get('sw_lng')
 
     # Calculate the bounding box for the region
-    lat_min = latitude - radius
-    lat_max = latitude + radius
-    long_min = longitude - radius
-    long_max = longitude + radius
+    lat_min = float(sw_lat)
+    lat_max = float(ne_lat)
+    long_min = float(sw_lng)
+    long_max = float(ne_lng)
 
     # Query for the checklists within the specified region
     checklists = db((db.checklist.latitude >= lat_min) &
@@ -91,11 +93,10 @@ def load_names():
                     (db.checklist.longitude <= long_max)).select().as_list()
 
     sampling_ids = [checklist['sampling_id'] for checklist in checklists]
-    print("Sampling id:", sampling_ids)
+
     # Query for the sightings of the specific bird name within the sampling IDs
     sightings = db((db.sightings.sighting_id.belongs(sampling_ids)) &
                    (db.sightings.name == bird_name)).select().as_list()
-    print("Sightings:", sightings)
     # Aggregate the count of sightings over time
     from collections import defaultdict
     from datetime import datetime
@@ -110,8 +111,7 @@ def load_names():
     # Sort dates and prepare data for the chart
     sorted_dates = sorted(counts_by_date.keys())
     counts = [counts_by_date[date] for date in sorted_dates]
-    print(sorted_dates)
-    print(counts)
+    
     return dict(labels=sorted_dates, values=counts)
 
 
@@ -119,23 +119,16 @@ def load_names():
 @action('load_info')
 @action.uses(db, session, auth) # Add here things like db, auth, etc.
 def load_info():
-    latitude = 37.5
-    #longitude = request.json.get('longitude')
-    longitude = -78
-    radius = 0.1  # default radius of 0.1 degree
-
-
-        # Calculate the bounding box for the region
-    lat_min = latitude - radius
-    lat_max = latitude + radius
-    long_min = longitude - radius
-    long_max = longitude + radius
+    ne_lat = request.params.get('ne_lat')
+    ne_lng = request.params.get('ne_lng')
+    sw_lat = request.params.get('sw_lat')
+    sw_lng = request.params.get('sw_lng')
 
     # Calculate the bounding box for the region
-    lat_min = latitude - radius
-    lat_max = latitude + radius
-    long_min = longitude - radius
-    long_max = longitude + radius
+    lat_min = float(sw_lat)
+    lat_max = float(ne_lat)
+    long_min = float(sw_lng)
+    long_max = float(ne_lng)
 
     # Query for the checklists within the specified region
     checklists = db((db.checklist.latitude >= lat_min) &
@@ -178,7 +171,7 @@ def load_info():
 
     # Sort users by their sighting counts and get the top three
     top_users = sorted(user_sighting_counts.items(), key=lambda item: item[1], reverse=True)[:3]
-    print(user_sighting_counts)
+    
 
     return dict(
         checklists=checklists,
@@ -186,3 +179,21 @@ def load_info():
         total_sightings=total_sightings,
         top_users=top_users
     )
+
+#controllers for index:
+@action('get_sightings', method=["GET"])
+@action.uses(db)
+def get_sightings():
+    query = (db.sightings.sighting_id == db.checklist.sampling_id)
+    sightings_list = db(query).select(
+        db.sightings.ALL, 
+        db.checklist.latitude, 
+        db.checklist.longitude
+    ).as_list()
+    return dict(sightings=sightings_list)
+
+@action('get_species', method=["GET"])
+@action.uses(db)
+def get_species():
+    species_list = db(db.species).select().as_list()
+    return dict(species=species_list)
